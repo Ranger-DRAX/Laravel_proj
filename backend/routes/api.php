@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\RestaurantController;
 use App\Http\Controllers\Api\BranchController;
+use App\Http\Controllers\Api\ClientBookingController;
 use App\Http\Controllers\Api\TableController;
 use App\Http\Controllers\Api\BookingController;
 use App\Http\Controllers\Api\PaymentController;
@@ -23,6 +24,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('restaurants', RestaurantController::class);
     // Branches
     Route::apiResource('branches', BranchController::class);
+
+    // Client bookings
+    Route::get('client-bookings', [ClientBookingController::class, 'index']);
+    Route::post('client-bookings', [ClientBookingController::class, 'store']);
+    Route::get('client-bookings/{id}', [ClientBookingController::class, 'show']);
+        Route::patch('client-bookings/{id}', [ClientBookingController::class,'update']);
+    Route::put('client-bookings/{id}/pay', [ClientBookingController::class, 'pay']);
+
     // Tables
     Route::apiResource('tables', TableController::class);
     // Bookings

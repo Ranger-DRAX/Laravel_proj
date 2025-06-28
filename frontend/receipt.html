@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Payment Receipt</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    .receipt-container{max-width:520px;margin:60px auto;background:linear-gradient(135deg,#252733 0%,#1c1e26 100%);padding:35px;border-radius:12px;color:#e0e9ff;font-family:'Inter',sans-serif;text-align:center;box-shadow:0 10px 25px rgba(0,0,0,.7);border:1px solid rgba(255,255,255,.07);}
+    .receipt-container h2{margin-bottom:25px;font-weight:600;font-size:26px;background:linear-gradient(90deg,#ff6b9f,#ff4f7d);-webkit-background-clip:text;color:transparent;}
+    .receipt-details{text-align:left;margin:25px 0;line-height:2;font-size:15px;}
+    .btn-group{display:flex;justify-content:space-around;margin-top:25px;}
+    button, a.btn{background:#ff4f7d;color:#fff;border:none;padding:11px 22px;border-radius:6px;cursor:pointer;font-size:14px;font-weight:500;text-decoration:none;transition:transform .2s;}
+    button:hover,a.btn:hover{transform:translateY(-2px);opacity:.9;}
+  </style>
+</head>
+<body>
+<div class="receipt-container" id="receiptCard" >
+  <h2>Payment Receipt</h2>
+  <div id="statusMsg">Fetching booking...</div>
+  <div class="receipt-details" id="details" style="display:none;"></div>
+  <div class="btn-group" id="actions" style="display:none;">
+    <button id="downloadBtn">Download PDF</button>
+    <a href="home.html" class="btn">Back to Home</a>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+const { jsPDF } = window.jspdf;
+const params=new URLSearchParams(window.location.search);
+const bookingId=params.get('bid');
+if(!bookingId){document.getElementById('statusMsg').textContent='Missing booking id';}
+
+function getToken(){return localStorage.getItem('token');}
+async function loadBooking(){
+  try{
+    const res=await fetch(`http://127.0.0.1:8000/api/client-bookings/${bookingId}`,{headers:{'Authorization':'Bearer '+getToken(),'Accept':'application/json'}});
+    if(!res.ok) throw new Error('Failed to fetch booking');
+    const b=await res.json();
+    render(b);
+  }catch(e){document.getElementById('statusMsg').textContent=e.message;}
+}
+
+function render(b){
+  document.getElementById('statusMsg').style.display='none';
+  const d=document.getElementById('details');
+  const storeFoods=localStorage.getItem(`foods_${bookingId}`);
+  const storeAmount=localStorage.getItem(`amount_${bookingId}`);
+  const foodsArr=b.foods?JSON.parse(b.foods||'[]'):(storeFoods?JSON.parse(storeFoods):[]);
+  const amountVal=b.amount||(storeAmount?parseInt(storeAmount):0);
+  d.innerHTML=`<strong>Restaurant:</strong> ${b.restaurant}<br>
+                <strong>Area:</strong> ${b.area}<br>
+                <strong>Seat Code:</strong> ${b.seat_code}<br>
+                <strong>Amount:</strong> ৳${amountVal}<br>
+                ${foodsArr.length?'<strong>Foods:</strong><br>'+foodsArr.map(f=>f.name+' - ৳'+f.price).join('<br>')+'<br>':''}
+                <strong>Status:</strong> ${b.status}<br>
+                <strong>Date:</strong> ${(new Date(b.updated_at)).toLocaleString()}`;
+  d.style.display='block';
+  document.getElementById('actions').style.display='flex';
+
+  document.getElementById('downloadBtn').onclick=()=>generatePDF(b);
+}
+
+function generatePDF(b){
+  const doc=new jsPDF();
+  doc.setFontSize(16);
+  doc.text('Payment Receipt', 105, 20, {align:'center'});
+  doc.setFontSize(12);
+  const lines=[
+    `Receipt ID: ${b.id}`,
+    `Restaurant: ${b.restaurant}`,
+    `Area: ${b.area}`,
+    `Seat Code: ${b.seat_code}`,
+    `Amount: ৳${b.amount}`,
+    ...(b.foods?['Foods:','',...JSON.parse(b.foods||'[]').map(f=>f.name+' - ৳'+f.price)]:[]),
+    `Status: ${b.status}`,
+    `Date: ${(new Date(b.updated_at)).toLocaleString()}`
+  ];
+  let y=40;
+  lines.forEach(l=>{doc.text(l,20,y);y+=8;});
+  doc.save(`receipt_${b.id}.pdf`);
+}
+
+loadBooking();
+</script>
+</body>
+</html>

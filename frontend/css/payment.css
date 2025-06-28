@@ -1,0 +1,8 @@
+body{background:#121926;color:#e2e8f0;font-family:'Inter',sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;}
+.payment-card{background:#1f2937;padding:40px;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.5);max-width:420px;width:100%;text-align:center;}
+.payment-card h2{margin-bottom:8px;color:#fff;}
+.payment-card p{margin:6px 0;color:#a0aec0;}
+.pay-btn{margin-top:24px;padding:12px 30px;background:#2979ff;border:none;border-radius:6px;color:#fff;font-size:16px;font-weight:600;cursor:pointer;transition:background .2s;}
+.pay-btn:hover{background:#1c64f2;}
+.spinner{border:4px solid #ccc;border-top:4px solid #2979ff;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite;margin:20px auto;display:none;}
+@keyframes spin{0%{transform:rotate(0);}100%{transform:rotate(360deg);}}

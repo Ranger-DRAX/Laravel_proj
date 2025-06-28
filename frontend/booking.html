@@ -6,70 +6,507 @@
   <title>Select Table | Feastly</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css" />
-  <link rel="stylesheet" href="css/booking.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #121926 0%, #1e293b 50%, #0f172a 100%);
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Bangladeshi Pattern Overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        radial-gradient(circle at 25% 25%, rgba(255, 193, 7, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 75% 75%, rgba(220, 53, 69, 0.1) 0%, transparent 50%),
+        linear-gradient(45deg, transparent 40%, rgba(255, 255, 255, 0.02) 41%, rgba(255, 255, 255, 0.02) 59%, transparent 60%);
+      background-size: 200px 200px, 150px 150px, 30px 30px;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .wrapper {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      position: relative;
+      z-index: 2;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      margin-top: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    #restName {
+      font-size: 2.5rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #121926, #334155, #64748b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .person-selector {
+      margin: 20px 0;
+      text-align: center;
+      padding: 20px;
+      background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+      border-radius: 15px;
+      border: 2px solid #121926;
+    }
+
+    .person-selector label {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #121926;
+      margin-right: 15px;
+    }
+
+    #personInput {
+      width: 80px;
+      padding: 10px;
+      border: 2px solid #121926;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      text-align: center;
+      background: white;
+      transition: all 0.3s ease;
+    }
+
+    #personInput:focus {
+      outline: none;
+      border-color: #64748b;
+      box-shadow: 0 0 10px rgba(100, 116, 139, 0.3);
+    }
+
+    #instruction {
+      text-align: center;
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #121926;
+      margin: 30px 0;
+      padding: 15px;
+      background: rgba(100, 116, 139, 0.1);
+      border-radius: 10px;
+      border-left: 5px solid #64748b;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 20px;
+      margin: 30px 0;
+      padding: 20px;
+      background: rgba(18, 25, 38, 0.05);
+      border-radius: 15px;
+      border: 2px dashed #121926;
+    }
+
+    .seat {
+      width: 120px;
+      height: 120px;
+      border-radius: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      font-weight: 600;
+      border: 3px solid transparent;
+      background-clip: padding-box;
+    }
+
+    /* Table type specific styling */
+    .seat[data-type="duo"] {
+      background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+      border-color: #475569;
+    }
+
+    .seat[data-type="duo"]::before {
+      content: '👫';
+      font-size: 1.5rem;
+      margin-bottom: 5px;
+    }
+
+    .seat[data-type="family"] {
+      background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+      border-color: #64748b;
+    }
+
+    .seat[data-type="family"]::before {
+      content: '👨‍👩‍👧‍👦';
+      font-size: 1.5rem;
+      margin-bottom: 5px;
+    }
+
+    .seat[data-type="big"] {
+      background: linear-gradient(135deg, #f1f5f9, #cbd5e1);
+      border-color: #334155;
+    }
+
+    .seat[data-type="big"]::before {
+      content: '👥';
+      font-size: 1.5rem;
+      margin-bottom: 5px;
+    }
+
+    .seat.available:hover {
+      transform: translateY(-5px) scale(1.05);
+      box-shadow: 0 10px 25px rgba(18, 25, 38, 0.3);
+      border-color: #64748b;
+    }
+
+    .seat.selected {
+      background: linear-gradient(135deg, #64748b, #475569) !important;
+      border-color: #121926 !important;
+      transform: scale(1.1);
+      box-shadow: 0 15px 30px rgba(100, 116, 139, 0.4);
+      animation: pulse 2s infinite;
+    }
+
+    .seat.selected::before {
+      content: '✨';
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 15px 30px rgba(100, 116, 139, 0.4); }
+      50% { box-shadow: 0 15px 30px rgba(100, 116, 139, 0.7); }
+      100% { box-shadow: 0 15px 30px rgba(100, 116, 139, 0.4); }
+    }
+
+    .seat.unavailable {
+      background: linear-gradient(135deg, #6c757d, #adb5bd) !important;
+      border-color: #495057 !important;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .seat.unavailable::before {
+      content: '🚫';
+    }
+
+    .seat.not-allowed {
+      opacity: 0.4;
+      cursor: not-allowed;
+      filter: grayscale(0.7);
+    }
+
+    .seat-code {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #121926;
+      text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+    }
+
+    .legend {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin: 30px 0;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 15px;
+      border: 2px solid #121926;
+    }
+
+    .legend > div {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+      color: #121926;
+    }
+
+    .legend span {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      display: inline-block;
+      border: 2px solid #121926;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #121926, #334155);
+      color: white;
+      border: none;
+      padding: 15px 40px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: block;
+      margin: 40px auto 0;
+      box-shadow: 0 10px 20px rgba(18, 25, 38, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 30px rgba(18, 25, 38, 0.4);
+      background: linear-gradient(135deg, #334155, #121926);
+    }
+
+    .btn-primary:hover::before {
+      left: 100%;
+    }
+
+    .btn-primary:active {
+      transform: translateY(-1px);
+    }
+
+    /* Decorative elements */
+    .wrapper::after {
+      content: '';
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      width: 60px;
+      height: 60px;
+      background: radial-gradient(circle, #64748b, #475569);
+      border-radius: 50%;
+      opacity: 0.7;
+      z-index: -1;
+    }
+
+    .wrapper::before {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: -10px;
+      width: 80px;
+      height: 80px;
+      background: radial-gradient(circle, #334155, #1e293b);
+      border-radius: 50%;
+      opacity: 0.6;
+      z-index: -1;
+    }
+
+    @media (max-width: 768px) {
+      .wrapper {
+        margin: 10px;
+        padding: 20px;
+      }
+
+      #restName {
+        font-size: 2rem;
+      }
+
+      .grid {
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: 15px;
+      }
+
+      .seat {
+        width: 100px;
+        height: 100px;
+      }
+
+      .legend {
+        flex-direction: column;
+        gap: 15px;
+      }
+    }
+  </style>
 </head>
 <body>
   <div class="wrapper">
-    <h2 id="restName" style="margin-bottom:10px;color:#dff0f0;"></h2>
-    <p>Select your preferred table:</p>
+    <h2 id="restName" style="margin-bottom:10px;color:#121926;"></h2>
+    
+    <div class="person-selector">
+      <label for="personInput">
+        <i class="fas fa-users"></i> Number of persons:
+      </label>
+      <input type="number" id="personInput" min="1" max="12" placeholder="1-12">
+    </div>
+    
+    <p id="instruction">Select your preferred table:</p>
     <div class="grid" id="tableGrid"></div>
 
     <div class="legend">
-      <div><span style="background:#fff;border:1px solid #ccc;"></span> Available</div>
-      <div><span style="background:#4caf50;"></span> Selected</div>
-      <div><span style="background:#bdbdbd;"></span> Unavailable</div>
+      <div>
+        <span style="background: linear-gradient(135deg, #f1f5f9, #e2e8f0); border-color: #475569;"></span> 
+        Available
+      </div>
+      <div>
+        <span style="background: linear-gradient(135deg, #64748b, #475569); border-color: #121926;"></span> 
+        Selected
+      </div>
+      <div>
+        <span style="background: linear-gradient(135deg, #6c757d, #adb5bd); border-color: #495057;"></span> 
+        Unavailable
+      </div>
     </div>
 
     <button id="confirmBtn" class="btn-primary" style="margin-top:40px;display:none;">Confirm Booking</button>
+    <i class="fas fa-check-circle"></i> Confirm Booking
   </div>
 
-<script>
+<script type="module">
+  (async ()=>{
   const urlParams = new URLSearchParams(window.location.search);
   const restId = urlParams.get('rest');
   const restNameParam = urlParams.get('name') || 'Restaurant';
+  const areaParam = restNameParam.split(' ')[0];
   document.getElementById('restName').textContent = restNameParam;
 
   const tableGrid = document.getElementById('tableGrid');
   const confirmBtn = document.getElementById('confirmBtn');
   let selectedCode = null;
 
-  // Generate 20 tables with codes T-01 ... T-20 (simulate unavailable ones)
-  const TOTAL = 20;
-  const unavailableSet = new Set(['T-05','T-12']); // demo booked tables
+  const DUO=['D1','D2','D3','D4','D5'];
+  const FAMILY=['F1','F2','F3','F4','F5'];
+  const BIG=['B1','B2','B3','B4','B5'];
+  const ALL_SEATS=[...DUO,...FAMILY,...BIG];
+  const seatType=c=>c.startsWith('D')?'duo':c.startsWith('F')?'family':'big';
+  let personsNum=0;
+  const unavailableSet=new Set(['D2', 'F3', 'B1']); // Demo unavailable seats
 
-  for(let i=1;i<=TOTAL;i++){
-    const code = 'T-' + String(i).padStart(2,'0');
-    const div = document.createElement('div');
-    div.className = 'seat '+(unavailableSet.has(code)?'unavailable':'available');
-    div.dataset.code = code;
-    div.innerHTML = `<div class="seat-code">${code}</div>`;
-    div.addEventListener('click',()=>{
-      if(div.classList.contains('unavailable'))return;
-      if(selectedCode){
-        // unselect previous
-        const prev = document.querySelector('.seat.selected');
-        if(prev){prev.classList.remove('selected');prev.classList.add('available');}
+  async function loadUnavailable(){
+    try{
+      const res=await fetch(`http://127.0.0.1:8000/api/client-bookings?restaurant=${encodeURIComponent(restNameParam)}`,{headers:{'Authorization':'Bearer '+getToken(),'Accept':'application/json'}});
+      if(res.ok){
+        const list=await res.json();
+        list.forEach(o=>unavailableSet.add(o.seat_code));
       }
-      div.classList.toggle('selected');
-      if(div.classList.contains('selected')){
-        div.classList.remove('available');
-        selectedCode = code;
-        confirmBtn.style.display='inline-block';
-      }else{
-        div.classList.add('available');
-        selectedCode=null;
-        confirmBtn.style.display='none';
-      }
-    });
-    tableGrid.appendChild(div);
+    }catch(e){console.warn('Unable to load booked seats');}
   }
 
-  confirmBtn.addEventListener('click',()=>{
-    if(!selectedCode)return;
-    alert(`Table ${selectedCode} booked! (Flow not yet integrated with backend)`);
+  // Comment out API call for demo
+  // await loadUnavailable();
+
+  function renderSeats(){
+    tableGrid.innerHTML='';
+    ALL_SEATS.forEach(code=>{
+      const type=seatType(code);
+      const div=document.createElement('div');
+      div.className='seat '+(unavailableSet.has(code)?'unavailable':'available');
+      div.dataset.code=code;
+      div.dataset.type=type;
+      div.innerHTML=`<div class="seat-code">${code}</div>`;
+      div.addEventListener('click',()=>{
+         if(div.classList.contains('unavailable')) return;
+         if(!isSelectableType(type)) return;
+         if(selectedCode===code){ // deselect
+            div.classList.remove('selected');
+            selectedCode=null;
+            confirmBtn.style.display='none';
+            return;
+         }
+         document.querySelectorAll('.seat.selected').forEach(s=>s.classList.remove('selected'));
+         selectedCode=code;
+         div.classList.add('selected');
+         confirmBtn.style.display='inline-block';
+      });
+      applySelectableStyle(div);
+      tableGrid.appendChild(div);
+    });
+  }
+
+  function applySelectableStyle(div){
+    const type=div.dataset.type;
+    if(isSelectableType(type)){
+      div.classList.remove('not-allowed');
+    }else{
+      div.classList.add('not-allowed');
+    }
+  }
+
+  function updateAllSeatStyles(){
+    document.querySelectorAll('.seat').forEach(applySelectableStyle);
+  }
+
+  function preferredType(){
+    if(personsNum&&personsNum<=2) return 'duo';
+    if(personsNum&&personsNum<=4) return 'family';
+    return 'big';
+  }
+
+  function isSelectableType(type){
+    if(!personsNum) return false;
+    const order=['duo','family','big'];
+    const pref=preferredType();
+    const prefIdx=order.indexOf(pref);
+    const typeIdx=order.indexOf(type);
+    if(typeIdx<prefIdx) return false;
+    if(typeIdx===prefIdx) return true;
+    return !ALL_SEATS.some(c=>seatType(c)===pref && !unavailableSet.has(c));
+  }
+
+  function refreshInstruction(){
+    const typeNames = {duo: 'couple', family: 'family', big: 'large group'};
+    const txt=personsNum?`for ${personsNum} person(s)`:'';
+    document.getElementById('instruction').textContent=`Select a ${typeNames[preferredType()]} table ${txt}`;
+  }
+
+  renderSeats();
+  updateAllSeatStyles();
+  refreshInstruction();
+
+  const personInput=document.getElementById('personInput');
+  personInput.addEventListener('input',()=>{
+    personsNum=parseInt(personInput.value)||0;
+    refreshInstruction();
+    selectedCode=null;
+    confirmBtn.style.display='none';
+    document.querySelectorAll('.seat.selected').forEach(s=>s.classList.remove('selected'));
+    updateAllSeatStyles();
   });
+
+  function getToken(){return localStorage.getItem('token');}
+  function authHeaders(){return { 'Content-Type':'application/json','Accept':'application/json','Authorization':'Bearer '+getToken()};}
+
+  async function createBooking(){
+    const payload={restaurant:restNameParam,area:areaParam,seat_code:selectedCode,amount:1000,persons:personsNum,table_type:seatType(selectedCode)};
+    const res=await fetch('http://127.0.0.1:8000/api/client-bookings',{
+      method:'POST',headers:authHeaders(),body:JSON.stringify(payload)
+    });
+    if(!res.ok) throw new Error('Failed to create booking');
+    const data=await res.json();
+    return data.id;
+  }
+
+  confirmBtn.addEventListener('click',async ()=>{
+    if(!selectedCode)return;
+    try{
+      const bookingId=await createBooking();
+      window.location.href=`food.html?bid=${bookingId}`;
+    }catch(e){alert(e.message);}
+  });
+  })();
 </script>
 </body>
 </html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Payment | Feastly</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/payment.css" />
+</head>
+<body>
+  <div class="payment-card">
+    <h2>Confirm Payment</h2>
+    <p id="restInfo"></p>
+    <p id="tableInfo"></p>
+    <div id="foodList" style="margin-bottom:12px;"></div>
+    <p id="amountRow"><strong>Amount:</strong> ৳0</p>
+    <button class="pay-btn" id="payBtn">Pay with bKash</button>
+    <div class="spinner" id="spinner"></div>
+    <p id="statusMsg" style="margin-top:16px;"></p>
+  </div>
+
+<script>
+  const params=new URLSearchParams(window.location.search);
+const bookingId=params.get('bid');
+  async function load(){
+    const res=await fetch(`http://127.0.0.1:8000/api/client-bookings/${bookingId}`,{headers:{'Authorization':'Bearer '+localStorage.getItem('token'),'Accept':'application/json'}});
+    const b=await res.json();
+    document.getElementById('restInfo').textContent=`Restaurant: ${b.restaurant}`;
+    document.getElementById('tableInfo').textContent=`Table: ${b.seat_code}`;
+    const bookingFee=500;
+    const payable=Math.round(b.amount*0.25)+bookingFee;
+    document.getElementById('amountRow').innerHTML=`<strong>Payable Now (25% + ৳${bookingFee} booking fee):</strong> ৳${payable}`;
+    if(b.foods){const foods=JSON.parse(b.foods||'[]');document.getElementById('foodList').innerHTML=foods.map(f=>`${f.name} - ৳${f.price}`).join('<br>');}
+  }
+  load();
+
+  const payBtn=document.getElementById('payBtn');
+  const spinner=document.getElementById('spinner');
+  const statusMsg=document.getElementById('statusMsg');
+
+  payBtn.addEventListener('click',()=>{
+    payBtn.style.display='none';
+    spinner.style.display='block';
+    statusMsg.textContent='Redirecting to bKash...';
+    // simulate gateway delay
+    setTimeout(async ()=>{
+      spinner.style.display='none';
+      statusMsg.textContent='Recording payment...';
+      try{
+        const res=await fetch(`http://127.0.0.1:8000/api/client-bookings/${bookingId}/pay`,{method:'PUT',headers:{'Authorization':'Bearer '+localStorage.getItem('token'),'Accept':'application/json'}});
+        if(!res.ok)throw new Error('API error');
+        window.location.href=`receipt.html?bid=${bookingId}`;
+      }catch(e){statusMsg.textContent='Payment saved locally but failed to sync.';}
+    },3000)
+  });
+</script>
+</body>
+</html>
