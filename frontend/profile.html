@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Profile | Feastly</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/profile.css" />
+  <!-- styles moved to css/profile.css -->
+    .profile-container{max-width:600px;margin:80px auto;padding:40px;border-radius:8px;background:#fff;box-shadow:0 3px 20px rgba(0,0,0,.1);} 
+    .profile-container h2{margin-bottom:24px;text-align:center;}
+    .form-group{margin-bottom:18px;}
+    .form-group label{display:block;font-weight:600;margin-bottom:6px;}
+    .form-group input{width:100%;padding:10px 12px;border:1px solid #ccc;border-radius:4px;font-size:15px;}
+    .btn-primary{display:inline-block;padding:10px 24px;background:#ff7043;color:#fff;border:none;border-radius:4px;font-size:16px;cursor:pointer;transition:background .2s ease;}
+    .btn-primary:hover{background:#ff5722;}
+
+</head>
+<body>
+  <div class="profile-container">
+    <h2>Profile Dashboard</h2>
+    <form id="profileForm">
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input type="text" id="name" />
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" />
+      </div>
+      <div class="form-group">
+        <label for="role">Role</label>
+        <input type="text" id="role" disabled />
+      </div>
+      <div class="form-group">
+        <label for="phone">Phone</label>
+        <input type="text" id="phone" placeholder="Optional" />
+      </div>
+      <hr />
+      <div class="form-group">
+        <label for="password">New Password</label>
+        <input type="password" id="password" placeholder="Leave blank to keep current" />
+      </div>
+      <div class="form-group">
+        <label for="password_confirmation">Confirm Password</label>
+        <input type="password" id="password_confirmation" placeholder="Repeat new password" />
+      </div>
+      <button type="submit" class="btn-primary">Save Changes</button>
+    </form>
+  </div>
+
+<script>
+  const API_BASE = 'http://127.0.0.1:8000/api';
+
+  function getToken() {
+    return localStorage.getItem('token');
+  }
+
+  function authHeaders() {
+    return {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': 'Bearer ' + getToken()
+    };
+  }
+
+  async function loadProfile() {
+    const res = await fetch(`${API_BASE}/profile`, {
+      headers: authHeaders()
+    });
+    if(!res.ok){
+      alert('Failed to load profile. Please login again.');
+      window.location.href = 'login.html';
+      return;
+    }
+    const data = await res.json();
+    document.getElementById('name').value = data.name || '';
+    document.getElementById('email').value = data.email || '';
+    document.getElementById('role').value = data.role || '';
+    document.getElementById('phone').value = data.phone || '';
+  }
+
+  document.getElementById('profileForm').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const payload = {
+      name: document.getElementById('name').value.trim(),
+      email: document.getElementById('email').value.trim(),
+      phone: document.getElementById('phone').value.trim(),
+    };
+    const pw = document.getElementById('password').value;
+    const pwc = document.getElementById('password_confirmation').value;
+    if(pw){
+      if(pw !== pwc){
+        alert('Passwords do not match');
+        return;
+      }
+      payload.password = pw;
+      payload.password_confirmation = pwc;
+    }
+    // Remove empty fields
+    Object.keys(payload).forEach(k => (payload[k] === '') && delete payload[k]);
+    try{
+      const res = await fetch(`${API_BASE}/profile`, {
+        method: 'PUT',
+        headers: authHeaders(),
+        body: JSON.stringify(payload)
+      });
+      if(!res.ok){
+        const err = await res.text();
+        throw new Error(err);
+      }
+      const data = await res.json();
+      // Update stored name if changed
+      localStorage.setItem('name', data.user.name);
+      alert('Profile updated successfully');
+      // clear password fields
+      document.getElementById('password').value='';
+      document.getElementById('password_confirmation').value='';
+    }catch(err){
+      console.error(err);
+      alert('Failed to update: '+err.message);
+    }
+  });
+
+  loadProfile();
+</script>
+</body>
+</html>

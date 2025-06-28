@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feastly - Discover & Connect with the Best Restaurants</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Animated Background Elements -->
+    <div class="bg-animations">
+        <div class="floating-element" data-speed="2"></div>
+        <div class="floating-element" data-speed="3"></div>
+        <div class="floating-element" data-speed="1.5"></div>
+        <div class="floating-element" data-speed="2.5"></div>
+        <div class="floating-element" data-speed="1.8"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="#" class="logo">
+                    <span class="logo-icon">🍽️</span>
+                    <span class="logo-text">Feastly</span>
+                </a>
+                
+                <div id="userInfo" class="user-info"></div>
+                <nav class="nav">
+                    <ul class="nav-links">
+                        <li>
+                            <a href="explore.html" class="nav-link">
+                                <i class="fas fa-utensils nav-icon"></i>
+                                <span class="nav-text">Explore</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="profile.html" id="profileLink" class="nav-link" style="display:none;">
+                                <i class="fas fa-user-circle nav-icon"></i>
+                                <span class="nav-text">Profile</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" id="addRestaurantLink" class="nav-link">
+                                <i class="fas fa-plus-circle nav-icon"></i>
+                                <span class="nav-text">Add Restaurant</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="login.html" id="loginLogoutLink" class="login-btn">
+                                <i class="fas fa-user"></i>
+                                <span>Login</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Discover & Connect with the Best Restaurants</h1>
+            <p>Find your next culinary adventure with Feastly's curated selection of top-rated restaurants in your area.</p>
+        </div>
+
+        <!-- Enhanced Restaurant Table Scene -->
+        <div class="restaurant-scene">
+            <div class="table-container">
+                <div class="table-main">
+                    <div class="table-surface"></div>
+                    <div class="table-leg"></div>
+                    <div class="table-leg"></div>
+                    <div class="table-leg"></div>
+                    <div class="table-leg"></div>
+                </div>
+                
+                <!-- Dinnerware -->
+                <div class="dinnerware">
+                    <div class="plate plate-1">
+                        <div class="food-item"></div>
+                        <div class="garnish"></div>
+                    </div>
+                    <div class="plate plate-2">
+                        <div class="food-item"></div>
+                        <div class="garnish"></div>
+                    </div>
+                    <div class="plate plate-3">
+                        <div class="food-item"></div>
+                    </div>
+                    <div class="plate plate-4">
+                        <div class="food-item"></div>
+                    </div>
+                    
+                    <div class="wine-glass glass-1">
+                        <div class="wine-liquid"></div>
+                        <div class="glass-shine"></div>
+                    </div>
+                    <div class="wine-glass glass-2">
+                        <div class="wine-liquid"></div>
+                        <div class="glass-shine"></div>
+                    </div>
+                    <div class="wine-glass glass-3">
+                        <div class="wine-liquid"></div>
+                        <div class="glass-shine"></div>
+                    </div>
+                    <div class="wine-glass glass-4">
+                        <div class="wine-liquid"></div>
+                        <div class="glass-shine"></div>
+                    </div>
+                    
+                    <div class="cutlery fork-1"></div>
+                    <div class="cutlery knife-1"></div>
+                    <div class="cutlery fork-2"></div>
+                    <div class="cutlery knife-2"></div>
+                </div>
+                
+                <!-- Table ambiance -->
+                <div class="candle">
+                    <div class="candle-flame"></div>
+                    <div class="candle-glow"></div>
+                </div>
+                <div class="napkin napkin-1"></div>
+                <div class="napkin napkin-2"></div>
+            </div>
+        </div>
+        <div class="gradient-overlay"></div>
+</section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="social-links">
+                <a href="#" class="social-link facebook">
+                    <i class="fab fa-facebook"></i>
+                    <span>facebook.com/FeastlyOfficial</span>
+                    <div class="social-hover"></div>
+                </a>
+                <a href="#" class="social-link instagram">
+                    <i class="fab fa-instagram"></i>
+                    <span>Instagram.com/FeastlyApp</span>
+                    <div class="social-hover"></div>
+                </a>
+            </div>
+            <div class="footer-links">
+                <a href="#" class="footer-link">
+                    <span>Privacy Policy</span>
+                    <div class="link-underline"></div>
+                </a>
+                <a href="#" class="footer-link">
+                    <span>Terms & Conditions</span>
+                    <div class="link-underline"></div>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/app.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const headerContent = document.querySelector('.header-content');
+    const userInfoDiv = document.getElementById('userInfo');
+    const loginLogoutLink = document.getElementById('loginLogoutLink');
+    const addRestaurantLink = document.getElementById('addRestaurantLink');
+
+    const token = localStorage.getItem('token');
+    const name = localStorage.getItem('name');
+    const role = localStorage.getItem('role');
+
+    if (token && role && name) {
+      document.getElementById('profileLink').style.display = 'inline-block';
+      userInfoDiv.textContent = `${name} (${role})`;
+      loginLogoutLink.innerHTML = '<i class="fas fa-sign-out-alt"></i><span>Logout</span>';
+      loginLogoutLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        localStorage.clear();
+        window.location.href = 'login.html';
+      });
+    } else {
+      document.getElementById('profileLink').style.display = 'none';
+    }
+
+    if (addRestaurantLink) {
+      addRestaurantLink.addEventListener('click', (e) => {
+        if (!role || role !== 'owner') {
+          e.preventDefault();
+          alert('This feature is only for Business owners.');
+        }
+      });
+    }
+  });
+</script>
+</body>
+</html>

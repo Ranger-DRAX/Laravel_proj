@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Select Table | Feastly</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/booking.css" />
+
+</head>
+<body>
+  <div class="wrapper">
+    <h2 id="restName" style="margin-bottom:10px;color:#dff0f0;"></h2>
+    <p>Select your preferred table:</p>
+    <div class="grid" id="tableGrid"></div>
+
+    <div class="legend">
+      <div><span style="background:#fff;border:1px solid #ccc;"></span> Available</div>
+      <div><span style="background:#4caf50;"></span> Selected</div>
+      <div><span style="background:#bdbdbd;"></span> Unavailable</div>
+    </div>
+
+    <button id="confirmBtn" class="btn-primary" style="margin-top:40px;display:none;">Confirm Booking</button>
+  </div>
+
+<script>
+  const urlParams = new URLSearchParams(window.location.search);
+  const restId = urlParams.get('rest');
+  const restNameParam = urlParams.get('name') || 'Restaurant';
+  document.getElementById('restName').textContent = restNameParam;
+
+  const tableGrid = document.getElementById('tableGrid');
+  const confirmBtn = document.getElementById('confirmBtn');
+  let selectedCode = null;
+
+  // Generate 20 tables with codes T-01 ... T-20 (simulate unavailable ones)
+  const TOTAL = 20;
+  const unavailableSet = new Set(['T-05','T-12']); // demo booked tables
+
+  for(let i=1;i<=TOTAL;i++){
+    const code = 'T-' + String(i).padStart(2,'0');
+    const div = document.createElement('div');
+    div.className = 'seat '+(unavailableSet.has(code)?'unavailable':'available');
+    div.dataset.code = code;
+    div.innerHTML = `<div class="seat-code">${code}</div>`;
+    div.addEventListener('click',()=>{
+      if(div.classList.contains('unavailable'))return;
+      if(selectedCode){
+        // unselect previous
+        const prev = document.querySelector('.seat.selected');
+        if(prev){prev.classList.remove('selected');prev.classList.add('available');}
+      }
+      div.classList.toggle('selected');
+      if(div.classList.contains('selected')){
+        div.classList.remove('available');
+        selectedCode = code;
+        confirmBtn.style.display='inline-block';
+      }else{
+        div.classList.add('available');
+        selectedCode=null;
+        confirmBtn.style.display='none';
+      }
+    });
+    tableGrid.appendChild(div);
+  }
+
+  confirmBtn.addEventListener('click',()=>{
+    if(!selectedCode)return;
+    alert(`Table ${selectedCode} booked! (Flow not yet integrated with backend)`);
+  });
+</script>
+</body>
+</html>
